@@ -7,6 +7,9 @@ class LinkedPair:
         self.value = value
         self.next = None
 
+    def __repr__(self):
+        return f"{self.key}: {self.value}, next: {self.next}"
+
 class HashTable:
     '''
     A hash table that with `capacity` buckets
@@ -15,7 +18,6 @@ class HashTable:
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
-
 
     def _hash(self, key):
         '''
@@ -51,9 +53,33 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        """
+        if we have an item at the designated index we want to create a Linked List at that index
+        add the item to the Linked List
+        """
 
+        index = self._hash_mod(key)
 
+        if self.storage[index] is not None:
+            # print(f"There was a collision at {index}")
+            new_pair = LinkedPair(key, value)
+            """
+            go inside collision
+            New pair should be first
+            Old pair should be last
+            """
+            old_pair = self.storage[index]
+
+            self.storage[index] = new_pair
+            new_pair.next = old_pair
+        else:
+            self.storage[index] = LinkedPair(key, value)
+        
+        # print(f"inserting {key}: {value} at {index}")
+        # print(f"{self.storage}")
+        # print("")
+
+    
 
     def remove(self, key):
         '''
@@ -63,7 +89,24 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+
+        if self.storage[index] is not None:
+            if self.storage[index].key == key:
+                self.storage[index].value = None
+            else:
+                current = self.storage[index]
+                while current.next is not None:
+                    current = current.next
+                    
+                    if current.key == key:
+                        current.value = None
+                
+                return f"No key found at {index}"
+        else:
+            return f"No key found at {index}"
+
+        
 
 
     def retrieve(self, key):
@@ -74,7 +117,25 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+
+        if self.storage[index] is not None:
+            if self.storage[index].key == key:
+                return self.storage[index].value
+            else:
+                current = self.storage[index]
+                while current.next is not None:
+                    current = current.next
+
+                    if current.key == key:
+                        return current.value
+
+                return None
+        else:
+            return None
+
+            
+
 
 
     def resize(self):
@@ -84,7 +145,31 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        self.capacity *= 2
+        old_storage = self.storage
+        self.storage = [None] * self.capacity
+
+        """
+        copy items from old_storage into new_storage where new_storage is updated self.storage
+        """
+
+        for i in range(0, len(old_storage)):
+            """
+            walk through old storage[i] and assign values to new_storage
+            """
+            if old_storage[i]:
+                pair = old_storage[i]
+                if pair.next is not None:
+                    current = pair
+                    while current:
+                        self.insert(current.key, current.value)
+                        current = current.next
+                else:
+                    self.insert(pair.key, pair.value)
+
+
+            
+
 
 
 
