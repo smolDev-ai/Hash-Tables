@@ -25,7 +25,7 @@ class HashTable:
 
         You may replace the Python hash with DJB2 as a stretch goal.
         '''
-        return hash(key)
+        return self._hash_djb2(key)
 
 
     def _hash_djb2(self, key):
@@ -34,7 +34,10 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+        hash = 5381
+        for letter in key:
+            hash = ((hash * 33) + ord(letter))
+        return hash
 
 
     def _hash_mod(self, key):
@@ -93,14 +96,17 @@ class HashTable:
 
         if self.storage[index] is not None:
             if self.storage[index].key == key:
-                self.storage[index].value = None
+                remove_val = self.storage[index]
+                new_val = self.storage[index].next
+                self.storage[index] = new_val
             else:
                 current = self.storage[index]
                 while current.next is not None:
+                    previous = current
                     current = current.next
                     
                     if current.key == key:
-                        current.value = None
+                        previous.next = current.next
                 
                 return f"No key found at {index}"
         else:
@@ -150,7 +156,8 @@ class HashTable:
         self.storage = [None] * self.capacity
 
         """
-        copy items from old_storage into new_storage where new_storage is updated self.storage
+        copy items from old_storage into new_storage where new_storage is 
+        updated self.storage
         """
 
         for i in range(0, len(old_storage)):
